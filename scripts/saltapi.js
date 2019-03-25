@@ -76,7 +76,7 @@ function SaltAPI(url) {
 	SaltAPI.prototype.start = function (target = '*', command = 'test.ping', args = undefined, kwargs = undefined) {
 		var _this = this;
 		//TODO: support array of targets?
-		return fetch(_this.url() + '/minions', {
+		return fetch(_this.url + '/minions', {
 			method: 'POST',
 			redirect: 'manual',
 			headers: {
@@ -105,7 +105,7 @@ function SaltAPI(url) {
 	SaltAPI.prototype.poll = function (jid) {
 		var _this = this;
 		console.log(this);
-		return fetch(_this.url() + '/jobs/' + jid, {
+		return fetch(_this.url + '/jobs/' + jid, {
 			redirect: 'manual',
 			headers: {
 				'Accept': 'application/json',
