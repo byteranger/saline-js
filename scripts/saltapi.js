@@ -3,6 +3,8 @@
 function SaltAPI(url) {
 	this.url = url;
 	this.token = null;
+	this.waitTries = 10;
+	this.waitSeconds = 10;
 }
 
 // Privacy
@@ -101,7 +103,7 @@ function SaltAPI(url) {
 		});
 	};
 
-	// poll job for completion
+	// poll job for result
 	SaltAPI.prototype.poll = function (jid) {
 		var _this = this;
 		console.log(this);
@@ -117,8 +119,33 @@ function SaltAPI(url) {
 		.then(tResOk)
 		.then(function (obj) {
 			if (obj === null || typeof obj !== 'object' || !Array.isArray(obj.return) || !obj.return.length)
+				//TODO: more malformation tests?
 				throw new Error('Malformed response from server');
 			return obj.return[0];
+		});
+	};
+
+	// wait for job completion
+	SaltAPI.prototype.wait = function (jid) {
+		var _this = this;
+		var tries = 0;
+		return new Promise(function waiter(resolve, reject) {
+			if (++tries > _this.waitTries ) {
+				reject(new Error('Exceeded maximum number of poll attempts to wait for (' + _this.waitTries + ')'));
+				return;
+			}
+			_this.poll(jid)
+			.then(function (job) {
+				console.log('Wait poll', tries, job); //DEBUG
+				if (job.Minions.length == Object.keys(job.Result).length) {
+					// Job's done
+					resolve(job);
+				} else {
+					// Try again after a bit
+					setTimeout(waiter, _this.waitSeconds * 1000, resolve, reject);
+				}
+			})
+			.catch(reject);
 		});
 	};
 
