@@ -10,11 +10,6 @@ function SaltAPI(url) {
 // Privacy
 (function () {
 
-	var defaultHeaders = {
-		'Accept': 'application/json',
-		'Content-Type': 'application/json',
-	};
-
 	function tResUnauthorized(res) {
 		if (res.status == 401)
 			throw new Error('Unauthorized');
@@ -66,11 +61,11 @@ function SaltAPI(url) {
 		// 500: // Internal Server Error
 		.then(tResUnexpected)
 		.then(tResOk)
-		.then(function (obj) {
+		.then(function (result) {
 			//TODO: try/catch/throw Error
 			//TODO: utilize more of return object?
 			//TODO: store expire time
-			return _this.token = obj.return[0].token;
+			return _this.token = result.return[0].token;
 		});
 	};
 
@@ -78,6 +73,7 @@ function SaltAPI(url) {
 	SaltAPI.prototype.start = function (target = '*', command = 'test.ping', args = undefined, kwargs = undefined) {
 		var _this = this;
 		//TODO: support array of targets?
+		//TODO: configurable target type?
 		return fetch(_this.url + '/minions', {
 			method: 'POST',
 			redirect: 'manual',
@@ -96,27 +92,27 @@ function SaltAPI(url) {
 		.then(tResUnauthorized)
 		.then(tResUnexpected)
 		.then(tResOk)
-		.then(function (obj) {
-			if (obj === null || typeof obj !== 'object' || !Array.isArray(obj.return) || !obj.return.length)
+		.then(function (result) {
+			if (result === null || typeof result !== 'object' || !Array.isArray(result.return) || !result.return.length)
 				throw new Error('Malformed response from server');
-			return obj.return[0];
+			return result.return[0];
 		});
 	};
 
 	// poll job for result
-	SaltAPI.prototype.poll = function (jid) {
+	SaltAPI.prototype.poll = function (job) {
 		var _this = this;
-		switch (typeof jid) {
+		switch (typeof job) {
 			case 'object':
-				if (!jid.jid || typeof jid.jid != 'string')
+				if (!job.jid || typeof job.jid != 'string')
 					return Promise.reject(new Error('Object is not a proper job object'));
-				jid = jid.jid;
+				job = job.jid;
 				break;
 			case 'array':
 				return Promise.reject(new Error('Arrays of JIDs are not yet supported'));
 				break;
 		}
-		return fetch(_this.url + '/jobs/' + jid, {
+		return fetch(_this.url + '/jobs/' + job, {
 			redirect: 'manual',
 			headers: {
 				'Accept': 'application/json',
@@ -135,7 +131,7 @@ function SaltAPI(url) {
 	};
 
 	// wait for job completion
-	SaltAPI.prototype.wait = function (jid) {
+	SaltAPI.prototype.wait = function (job) {
 		var _this = this;
 		var tries = 0;
 		return new Promise(function waiter(resolve, reject) {
@@ -143,7 +139,7 @@ function SaltAPI(url) {
 				reject(new Error('Exceeded maximum number of poll attempts to wait for (' + _this.waitTries + ')'));
 				return;
 			}
-			_this.poll(jid)
+			_this.poll(job)
 			.then(function (job) {
 				console.log('Wait poll', tries, job); //DEBUG
 				if (job.Minions.length == Object.keys(job.Result).length) {
@@ -160,8 +156,7 @@ function SaltAPI(url) {
 
 	// logout
 	SaltAPI.prototype.logout = function () {
-		var _this = this;
-		_this.token = null;
+		this.token = null;
 	};
 
 })();
