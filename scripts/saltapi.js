@@ -106,7 +106,16 @@ function SaltAPI(url) {
 	// poll job for result
 	SaltAPI.prototype.poll = function (jid) {
 		var _this = this;
-		console.log(this);
+		switch (typeof jid) {
+			case 'object':
+				if (!jid.jid || typeof jid.jid != 'string')
+					return Promise.reject(new Error('Object is not a proper job object'));
+				jid = jid.jid;
+				break;
+			case 'array':
+				return Promise.reject(new Error('Arrays of JIDs are not yet supported'));
+				break;
+		}
 		return fetch(_this.url + '/jobs/' + jid, {
 			redirect: 'manual',
 			headers: {
