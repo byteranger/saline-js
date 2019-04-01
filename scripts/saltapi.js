@@ -8,7 +8,10 @@ function SaltAPI(url) {
 }
 
 // Privacy
+//TODO: rig up UMD and pass DI objects
 (function () {
+
+	//TODO: fetch timeout wrapper
 
 	function tResUnauthorized(res) {
 		if (res.status == 401)
@@ -150,6 +153,7 @@ function SaltAPI(url) {
 					setTimeout(waiter, _this.waitSeconds * 1000, resolve, reject);
 				}
 			})
+			//TODO: more complex reject logic on fetch failure?
 			.catch(reject);
 		});
 	};
