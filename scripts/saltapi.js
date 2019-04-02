@@ -3,8 +3,9 @@
 function SaltAPI(url) {
 	this.url = url;
 	this.token = null;
-	this.waitTries = 10;
+	this.waitTries = 6;
 	this.waitSeconds = 10;
+	this.debug = false;
 }
 
 // Privacy
@@ -138,19 +139,20 @@ function SaltAPI(url) {
 		var _this = this;
 		var tries = 0;
 		return new Promise(function waiter(resolve, reject) {
-			if (++tries > _this.waitTries ) {
-				reject(new Error('Exceeded maximum number of poll attempts to wait for (' + _this.waitTries + ')'));
-				return;
-			}
 			_this.poll(job)
 			.then(function (job) {
-				console.log('Wait poll', tries, job); //DEBUG
+				if (_this.debug) console.log('Wait poll', tries, job); //DEBUG
 				if (job.Minions.length == Object.keys(job.Result).length) {
 					// Job's done
 					resolve(job);
 				} else {
-					// Try again after a bit
-					setTimeout(waiter, _this.waitSeconds * 1000, resolve, reject);
+					if (++tries < _this.waitTries ) {
+						// Try again after a bit
+						setTimeout(waiter, _this.waitSeconds * 1000, resolve, reject);
+					} else {
+						// Give up waiting and return what we have
+						resolve(job);
+					}
 				}
 			})
 			//TODO: more complex reject logic on fetch failure?
