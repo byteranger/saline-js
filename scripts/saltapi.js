@@ -3,7 +3,7 @@
 function SaltAPI(url) {
 	this.url = url;
 	this.token = null;
-	this.waitTries = 6;
+	this.waitTries = 3;
 	this.waitSeconds = 10;
 	this.debug = false;
 }
