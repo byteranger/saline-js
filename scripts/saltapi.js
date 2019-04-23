@@ -22,7 +22,6 @@ function SaltAPI(url) {
 
 	function tResUnexpected(res) {
 		if (!res.ok) {
-			console.log(res);
 			throw new Error('Unexpected error, report to admin: ' + res.status + ' - ' + res.statusText);
 		}
 		return res;
@@ -76,6 +75,7 @@ function SaltAPI(url) {
 	// start a job
 	SaltAPI.prototype.start = function (target = '*', command = 'test.ping', args = undefined, kwargs = undefined) {
 		var _this = this;
+		if (_this.debug) console.log('Start', 'target=', target, 'command=', command, 'args=', args, 'kwargs=', kwargs);
 		//TODO: support array of targets?
 		//TODO: configurable target type?
 		return fetch(_this.url + '/minions', {
@@ -97,6 +97,7 @@ function SaltAPI(url) {
 		.then(tResUnexpected)
 		.then(tResOk)
 		.then(function (result) {
+			if (_this.debug) console.log('Start, then', result);
 			if (result === null || typeof result !== 'object' || !Array.isArray(result.return) || !result.return.length)
 				throw new Error('Malformed response from server');
 			return result.return[0];
@@ -106,6 +107,7 @@ function SaltAPI(url) {
 	// poll job for result
 	SaltAPI.prototype.poll = function (job) {
 		var _this = this;
+		if (_this.debug) console.log('Poll', job);
 		switch (typeof job) {
 			case 'object':
 				if (!job.jid || typeof job.jid != 'string')
@@ -127,9 +129,11 @@ function SaltAPI(url) {
 		.then(tResUnexpected)
 		.then(tResOk)
 		.then(function (obj) {
-			if (obj === null || typeof obj !== 'object' || !Array.isArray(obj.return) || !obj.return.length)
+			if (_this.debug) console.log('Poll, then', obj);
+			if (obj === null || typeof obj !== 'object' || !Array.isArray(obj.return) || !obj.return.length) {
 				//TODO: more malformation tests?
 				throw new Error('Malformed response from server');
+			}
 			return obj.return[0];
 		});
 	};
