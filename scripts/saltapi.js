@@ -146,7 +146,7 @@ function SaltAPI(url) {
 			_this.poll(job)
 			.then(function (job) {
 				if (_this.debug) console.log('Wait poll', tries, job); //DEBUG
-				if (job.Minions.length == Object.keys(job.Result).length) {
+				if (job.Minions && job.Result && job.Minions.length == Object.keys(job.Result).length) {
 					// Job's done
 					resolve(job);
 				} else {
