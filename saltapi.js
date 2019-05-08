@@ -1,16 +1,33 @@
 'use strict';
 
-function SaltAPI(url) {
-	this.url = url;
-	this.token = null;
-	this.waitTries = 3;
-	this.waitSeconds = 10;
-	this.debug = false;
-}
+// UMD Boilerplate (lightly customized from commonJsStrictGlobal)
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['exports', 'fetch'], function (exports, fetch) {
+            factory(exports, fetch);
+            root.SaltAPI = exports.SaltAPI;
+        });
+    } else if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
+        // CommonJS
+        factory(exports, require('node-fetch'));
+    } else {
+        // Browser globals
+        var exports = {}
+        factory(exports, root.fetch);
+        root.SaltAPI = exports.SaltAPI;
+    }
+}(typeof self !== 'undefined' ? self : this, function (exports, fetch) {
 
-// Privacy
-//TODO: rig up UMD and pass DI objects
-(function () {
+	// Module definition starts here
+
+	var SaltAPI = exports.SaltAPI = function (url) {
+		this.url = url;
+		this.token = null;
+		this.waitTries = 3;
+		this.waitSeconds = 10;
+		this.debug = false;
+	}
 
 	//TODO: fetch timeout wrapper
 
@@ -169,4 +186,4 @@ function SaltAPI(url) {
 		this.token = null;
 	};
 
-})();
+}));
