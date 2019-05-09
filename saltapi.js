@@ -2,26 +2,23 @@
 
 // UMD Boilerplate (lightly customized from commonJsStrictGlobal)
 (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['exports', 'fetch'], function (exports, fetch) {
-            factory(exports, fetch);
-            root.SaltAPI = exports.SaltAPI;
-        });
-    } else if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
-        // CommonJS
-        factory(exports, require('node-fetch'));
-    } else {
-        // Browser globals
-        var exports = {}
-        factory(exports, root.fetch);
-        root.SaltAPI = exports.SaltAPI;
-    }
-}(typeof self !== 'undefined' ? self : this, function (exports, fetch) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD
+		define(['fetch'], function (fetch) {
+			return (root.SaltAPI = factory(fetch));
+		});
+	} else if (typeof module === 'object' && module.exports) {
+		// NodeJS
+		module.exports = factory(require('node-fetch'));
+	} else {
+		// Browser globals
+		root.SaltAPI = factory(root.fetch);
+	}
+}(typeof self !== 'undefined' ? self : this, function (fetch) {
 
 	// Module definition starts here
 
-	var SaltAPI = exports.SaltAPI = function (url) {
+	function SaltAPI(url) {
 		this.url = url;
 		this.token = null;
 		this.waitTries = 3;
@@ -185,5 +182,7 @@
 	SaltAPI.prototype.logout = function () {
 		this.token = null;
 	};
+
+	return SaltAPI;
 
 }));
