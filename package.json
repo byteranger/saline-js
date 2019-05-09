@@ -2,5 +2,8 @@
 	"name": "salt-api-client",
 	"version": "0.1.0",
 	"license": "MIT",
-	"main": "saltapi.js"
+	"main": "saltapi.js",
+	"dependencies": {
+		"node-fetch": "^2.5.0"
+	}
 }
