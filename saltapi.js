@@ -16,15 +16,20 @@
 	}
 }(typeof self !== 'undefined' ? self : this, function (fetch) {
 
-	// Module definition starts here
+	////// Module definition starts here
 
-	function SaltAPI(url) {
+	//// Constructor
+	function SaltAPI(url, init = {}) {
+		// TODO: arg validation
+		// TODO: config object merge
 		this.url = url;
-		this.token = null;
-		this.waitTries = 3;
-		this.waitSeconds = 10;
-		this.debug = false;
+		this.token = init.token || null;
+		this.waitTries = init.waitTries || 3;
+		this.waitSeconds = init.waitSeconds || 10;
+		this.debug = init.debug || false;
 	}
+
+	//// Utility functions
 
 	//TODO: fetch timeout wrapper
 
@@ -50,6 +55,8 @@
 			return res.json().catch(eJsonBad);
 		return res;
 	}
+
+	//// Member functions
 
 	// login
 	SaltAPI.prototype.login = function (username, password) {
