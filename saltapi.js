@@ -53,7 +53,17 @@
 	function tResOk(res) {
 		if (res.ok && res.headers.has('Content-Type') && res.headers.get('Content-Type') == 'application/json')
 			return res.json().catch(eJsonBad);
-		return res;
+		return res; //TODO: throw error?
+	}
+
+	function tSaltRet0(fn, json) {
+		if (json === null || typeof json !== 'object' || !Array.isArray(json.return) || !json.return.length) {
+			//TODO: more malformation tests?
+			throw new Error('Malformed response from server');
+		}
+		var ret = json.return[0];
+		if (typeof fn === 'function') ret = fn(ret);
+		return ret;
 	}
 
 	//// Member functions
@@ -85,12 +95,14 @@
 		// 500: // Internal Server Error
 		.then(tResUnexpected)
 		.then(tResOk)
-		.then(function (result) {
+		.then(tSaltRet0.bind(undefined, function (auth) {
+			if (_this.debug) console.log('Login', 'auth=', auth);
 			//TODO: try/catch/throw Error
 			//TODO: utilize more of return object?
 			//TODO: store expire time
-			return _this.token = result.return[0].token;
-		});
+			//TODO: return true/false?
+			return _this.token = auth.token;
+		}));
 	};
 
 	// start a job
@@ -117,12 +129,7 @@
 		.then(tResUnauthorized)
 		.then(tResUnexpected)
 		.then(tResOk)
-		.then(function (result) {
-			if (_this.debug) console.log('Start, then', result);
-			if (result === null || typeof result !== 'object' || !Array.isArray(result.return) || !result.return.length)
-				throw new Error('Malformed response from server');
-			return result.return[0];
-		});
+		.then(tSaltRet0.bind(undefined, undefined));
 	};
 
 	// poll job for result
@@ -149,14 +156,7 @@
 		.then(tResUnauthorized)
 		.then(tResUnexpected)
 		.then(tResOk)
-		.then(function (obj) {
-			if (_this.debug) console.log('Poll, then', obj);
-			if (obj === null || typeof obj !== 'object' || !Array.isArray(obj.return) || !obj.return.length) {
-				//TODO: more malformation tests?
-				throw new Error('Malformed response from server');
-			}
-			return obj.return[0];
-		});
+		.then(tSaltRet0.bind(undefined, undefined));
 	};
 
 	// wait for job completion
