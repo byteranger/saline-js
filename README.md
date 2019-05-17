@@ -6,13 +6,13 @@
 
 - url
 - init
-  - token
-  - tokenExpire
-  - tokenRefreshTimer
-  - tokenAutoRefresh
-  - waitTries
-  - waitSeconds
-  - debug
+  - token : string : default = null
+  - tokenExpire : date : default = null
+  - tokenRefreshTimer : number/TimeoutID : default = null
+  - tokenAutoRefresh : boolean : default = false
+  - waitTries : number : default = 3
+  - waitSeconds : number : default = 10
+  - debug : boolean : default = false
 
 ##Examples
 
