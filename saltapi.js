@@ -24,6 +24,9 @@
 		// TODO: config object merge
 		this.url = url;
 		this.token = init.token || null;
+		this.tokenExpire = init.tokenExpire || null;
+		this.tokenRefreshTimer = init.tokenRefreshTimer || null;
+		this.tokenAutoRefresh = init.tokenAutoRefresh || false;
 		this.waitTries = init.waitTries || 3;
 		this.waitSeconds = init.waitSeconds || 10;
 		this.debug = init.debug || false;
@@ -97,11 +100,19 @@
 		.then(tResOk)
 		.then(tSaltRet0.bind(undefined, function (auth) {
 			if (_this.debug) console.log('Login', 'auth=', auth);
-			//TODO: try/catch/throw Error
-			//TODO: utilize more of return object?
-			//TODO: store expire time
+			//TODO: try/catch/throw Error?
+			_this.token = auth.token;
+			_this.tokenExpire = new Date(auth.expire * 1000);
+			if (_this.tokenAutoRefresh) {
+				var msRefresh = _this.tokenExpire - Date.now();
+				if (msRefresh <= 0)
+					throw new Error('Token already expired');
+				_this.tokenRefreshTimer = setTimeout(_this.login.bind(_this), msRefresh, username, password);
+				if (_this.debug)
+					console.log('Login auto refresh', 'msRefresh=', msRefresh, 'tokenRefreshTimer=', _this.tokenRefreshTimer);
+			}
 			//TODO: return true/false?
-			return _this.token = auth.token;
+			return auth;
 		}));
 	};
 
@@ -187,6 +198,9 @@
 
 	// logout
 	SaltAPI.prototype.logout = function () {
+		clearTimeout(this.tokenRefreshTimer);
+		this.tokenRefreshTimer = null;
+		this.tokenExpire = null;
 		this.token = null;
 	};
 
