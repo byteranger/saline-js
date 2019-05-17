@@ -1,6 +1,6 @@
 {
 	"name": "salt-api-client",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"license": "MIT",
 	"main": "saltapi.js",
 	"dependencies": {
