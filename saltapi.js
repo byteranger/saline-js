@@ -33,6 +33,7 @@
 	}
 
 	//// Utility functions
+	////TODO: convert to member functions?
 
 	//TODO: fetch timeout wrapper
 
@@ -60,6 +61,7 @@
 	}
 
 	function tSaltRet0(fn, json) {
+		//DEBUG: console.log('tSaltRet0', 'json=', json, 'fn=', fn, typeof fn);
 		if (json === null || typeof json !== 'object' || !Array.isArray(json.return) || !json.return.length) {
 			//TODO: more malformation tests?
 			throw new Error('Malformed response from server');
