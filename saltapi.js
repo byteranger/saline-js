@@ -133,6 +133,7 @@
 				'X-Auth-Token': _this.token,
 			},
 			body: JSON.stringify({
+				tgt_type: 'compound',
 				tgt: target,
 				fun: command,
 				arg: args,
