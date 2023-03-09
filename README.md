@@ -1,8 +1,8 @@
-#Salt Api Client
+# Salt Api Client
 
-##API
+## API
 
-###SaltAPI(url, init)
+### SaltAPI(url, init)
 
 - url
 - init
@@ -14,9 +14,9 @@
   - waitSeconds : number : default = 10
   - debug : boolean : default = false
 
-##Examples
+## Examples
 
-###Wait example
+### Wait example
 
 Will sleep minion for random 0-30 seconds and poll api for results:
 
